@@ -16,6 +16,21 @@ MORSE_DICT = {
     '(': '-.--.', ')': '-.--.-', ' ': '/'
 }
 
+def encode(text):
+    """Encode a text to morse code."""
+    words = []
+
+    for word in text.upper().split():
+        letters = []
+        for char in word:
+            if char not in MORSE_DICT:
+                raise ValueError(f"Character '{char}' cannot be encoded.")
+            letters.append(MORSE_DICT[char])
+        words.append(" ".join(letters))
+
+    return " / ".join(words)
+
+
 parser = argparse.ArgumentParser(description="A morse code convertor tool!")
 subparsers = parser.add_subparsers(dest="command", required=True)
 
