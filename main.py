@@ -16,6 +16,8 @@ MORSE_DICT = {
     '(': '-.--.', ')': '-.--.-', ' ': '/'
 }
 
+REVERSE = {code: char for char, code in MORSE_DICT.items()}
+
 def encode(text):
     """Encode a text to morse code."""
     words = []
@@ -29,6 +31,23 @@ def encode(text):
         words.append(" ".join(letters))
 
     return " / ".join(words)
+
+def decode(morse):
+    """Decode morse code to text"""
+
+    words = []
+
+    for word in morse.split("/"):
+        letters = []
+        for code in word.split():
+            if code not in REVERSE:
+                raise ValueError(f"Morse code '{code}' cannot be decoded.")
+            letters.append(REVERSE[code])
+        # to prevent adding empty words incase there are trailing spaces.
+        if letters:
+            words.append("".join(letters))
+    return " ".join(words)
+
 
 
 parser = argparse.ArgumentParser(description="A morse code convertor tool!")
