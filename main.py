@@ -70,6 +70,19 @@ def timing_sequence(morse):
         for letter_index, code in enumerate(letters):
             if letter_index>0:
                 sequence.append((False, 3))  # gap between letters
+
+                for symbol_index, symbol in enumerate(code):
+                    if symbol_index>0:
+                        sequence.append((False, 1)) # gap between symbols
+
+                    if symbol == ".":
+                        sequence.append((True, 1))  # dot
+                    elif symbol == "-":
+                        sequence.append((True, 3))  # dash
+                    else:
+                        raise ValueError(f"Invalid Morse code symbol: {symbol}")
+
+    return sequence
             
 
 
