@@ -1,5 +1,6 @@
 import argparse
 
+
 MORSE_DICT = {
     'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..',
     'E': '.', 'F': '..-.', 'G': '--.', 'H': '....', 
@@ -11,9 +12,9 @@ MORSE_DICT = {
     '1': '.----', '2': '..---', '3': '...--', 
     '4': '....-', '5': '.....', '6': '-....',
     '7': '--...', '8': '---..', '9': '----.',
-    '0': '-----', ', ': '--..--', '.': '.-.-.-',
-    '?': '..__..', '/': '-..-.', '-': '-....-', 
-    '(': '-.--.', ')': '-.--.-', ' ': '/'
+    '0': '-----', ',': '--..--', '.': '.-.-.-',
+    '?': '..--..', '/': '-..-.', '-': '-....-', 
+    '(': '-.--.', ')': '-.--.-'
 }
 
 REVERSE = {code: char for char, code in MORSE_DICT.items()}
@@ -49,19 +50,46 @@ def decode(morse):
     return " ".join(words)
 
 
+def timing_sequence(morse):
+    """
+    Turn Morse code into a list (is_on, units) pairs using the standard timing.
+    dot = 1 unit on
+    dash = 3 units on
+    gap btw symbols = 1 unit off
+    gap btw letters = 3 units off
+    gap btw words = 7 units off
+    """
+    sequence = []
 
-parser = argparse.ArgumentParser(description="A morse code convertor tool!")
-subparsers = parser.add_subparsers(dest="command", required=True)
+    words = [w.split() for w in morse.split("/") if w.strip()]
 
-enc = subparsers.add_parser("encode", help="Encode a text to morse code")
-enc.add_argument("text", nargs="+", type=str, help="Text to encode")
+    for word_index, letters in enumerate(words):
+        if word_index>0:
+            sequence.append((False, 7))  # gap between words
 
-dec = subparsers.add_parser("decode", help="Decode morse code to text")
-dec.add_argument("morse", nargs="+", type=str, help="Morse code to decode")
+        for letter_index, code in enumerate(letters):
+            if letter_index>0:
+                sequence.append((False, 3))  # gap between letters
+            
 
 
-args = parser.parse_args()
-if args.command == "encode":
-    print(encode(" ".join(args.text)))
-elif args.command == "decode":
-    print(decode(" ".join(args.morse)))
+
+def main():
+    parser = argparse.ArgumentParser(description="A morse code convertor tool!")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    enc = subparsers.add_parser("encode", help="Encode a text to morse code")
+    enc.add_argument("text", nargs="+", type=str, help="Text to encode")
+
+    dec = subparsers.add_parser("decode", help="Decode morse code to text")
+    dec.add_argument("morse", nargs="+", type=str, help="Morse code to decode")
+
+
+    args = parser.parse_args()
+    if args.command == "encode":
+        print(encode(" ".join(args.text)))
+    elif args.command == "decode":
+        print(decode(" ".join(args.morse)))
+
+if __name__ == "__main__":
+    main()
