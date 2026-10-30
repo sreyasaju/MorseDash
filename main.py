@@ -97,12 +97,18 @@ def main():
     dec = subparsers.add_parser("decode", help="Decode morse code to text")
     dec.add_argument("morse", nargs="+", type=str, help="Morse code to decode")
 
+    tim = subparsers.add_parser("timing", help="Generate timing sequence from morse code")
+    tim.add_argument("morse", nargs="+", type=str, help="Morse code to process")
 
     args = parser.parse_args()
     if args.command == "encode":
         print(encode(" ".join(args.text)))
     elif args.command == "decode":
         print(decode(" ".join(args.morse)))
+    elif args.command == "timing":
+        print(timing_sequence(" ".join(args.morse)))
+
+    
 
 if __name__ == "__main__":
     main()
