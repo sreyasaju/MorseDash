@@ -17,6 +17,7 @@ MORSE_DICT = {
     '(': '-.--.', ')': '-.--.-'
 }
 
+
 REVERSE = {code: char for char, code in MORSE_DICT.items()}
 
 def encode(text):
@@ -48,7 +49,6 @@ def decode(morse):
         if letters:
             words.append("".join(letters))
     return " ".join(words)
-
 
 def timing_sequence(morse):
     """
