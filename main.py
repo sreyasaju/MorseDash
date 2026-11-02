@@ -60,6 +60,7 @@ def write_wav(morse, path, wpm=15, frequency=600, sample_rate=8000):
     unit_duration = 1.2/wpm
     unit_frames = int(unit_duration * sample_rate)
 
+    wave.open(path,'wb').setparams((1,2,sample_rate,0,'NONE','not compressed'))
     
 
 
