@@ -1,4 +1,6 @@
 import argparse
+import math
+import wave
 
 
 MORSE_DICT = {
@@ -50,6 +52,17 @@ def decode(morse):
             words.append("".join(letters))
     return " ".join(words)
 
+
+def write_wav(morse, path, wpm=15, frequency=600, sample_rate=8000):
+    """
+    Write Morse code to the beeps in wav files. return the number of samples.
+    """
+    unit_duration = 1.2/wpm
+    unit_frames = int(unit_duration * sample_rate)
+
+    
+
+
 def timing_sequence(morse):
     """
     Turn Morse code into a list (is_on, units) pairs using the standard timing.
@@ -72,18 +85,21 @@ def timing_sequence(morse):
                 sequence.append((False, 3))  # gap between letters
 
             for symbol_index, symbol in enumerate(code):
-                                if symbol_index>0:
-                                    sequence.append((False, 1)) # gap between symbols
-            
-                                if symbol == ".":
-                                    sequence.append((True, 1))  # dot
-                                elif symbol == "-":
-                                    sequence.append((True, 3))  # dash
-                                else:
-                                    raise ValueError(f"Invalid Morse code symbol: {symbol}")
-            
+                if symbol_index>0:
+                    sequence.append((False, 1))  # gap between symbols
+
+                if symbol == ".":
+                    sequence.append((True, 1))  # dot
+                elif symbol == "-":
+                    sequence.append((True, 3))  # dash
+                else:
+                    raise ValueError(f"Invalid Morse code symbol: '{symbol}'")
     return sequence
             
+
+
+
+
 
 def main():
     parser = argparse.ArgumentParser(description="A morse code convertor tool!")
