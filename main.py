@@ -48,41 +48,11 @@ def decode(morse):
             if code not in REVERSE:
                 raise ValueError(f"Morse code '{code}' cannot be decoded.")
             letters.append(REVERSE[code])
-        # to prevent adding empty words incase there are trailing spaces.
+# to prevent adding empty words incase there are trailing spaces.
         if letters:
             words.append("".join(letters))
     return " ".join(words)
 
-
-def write_wav(morse, path, wpm=15, frequency=600, sample_rate=8000):
-    """
-    Write Morse code to the beeps in wav files. return the number of samples.
-    """
-    unit_duration = 1.2/wpm
-    unit_frames = int(unit_duration * sample_rate)
-
-    with wave.open(path, 'wb') as wav_file:
-        wav_file.setnchannels(1)  # mono
-        wav_file.setsampwidth(2)  # 2 bytes per sample
-        wav_file.setframerate(sample_rate)
-
-        audio_samples = bytearray()
-        sample_index = 0 #position across entire audio
-
-        for is_on, units in timing_sequence(morse):
-
-            total_frames = units*unit_frames
-
-            for i in range(total_frames):
-                if is_on:
-                    t = sample_index/sample_rate
-                    sine_wave = int(32767.0*math.sin(2.0*math.pi*frequency*t))
-                    audio_samples+=struct.pack('<h', sine_wave)
-                else:
-                    audio_samples+=struct.pack('<h', 0)
-                sample_index += 1
-
-        wav_file.writeframes(audio_samples)
 
 def timing_sequence(morse):
     """
@@ -116,11 +86,39 @@ def timing_sequence(morse):
                 else:
                     raise ValueError(f"Invalid Morse code symbol: '{symbol}'")
     return sequence
-            
 
+def write_wav(morse, path, wpm=15, frequency=600, sample_rate=8000):
+    """
+    Write Morse code to the beeps in wav files.
+    """
+    unit_duration = 1.2/wpm
+    unit_frames = int(unit_duration * sample_rate)
 
+    with wave.open(path, 'wb') as wav_file:
+        wav_file.setnchannels(1)  # mono
+        wav_file.setsampwidth(2)  # 2 bytes per sample
+        wav_file.setframerate(sample_rate)
 
+        audio_samples = bytearray()
+        sample_index = 0 #position across entire audio
 
+        for is_on, units in timing_sequence(morse):
+
+            total_frames = units*unit_frames
+
+            for i in range(total_frames):
+                if is_on:
+                    t = sample_index/sample_rate
+                    sine_wave = int(32767.0*math.sin(2.0*math.pi*frequency*t))
+                    audio_samples+=struct.pack('<h', sine_wave)
+                else:
+                    audio_samples+=struct.pack('<h', 0)
+                sample_index += 1
+
+        wav_file.writeframes(audio_samples)
+    return sample_index
+
+write_wav("... --- ...", "sos.wav")
 
 def main():
     parser = argparse.ArgumentParser(description="A morse code convertor tool!")
@@ -135,6 +133,10 @@ def main():
     tim = subparsers.add_parser("timing", help="Generate timing sequence from morse code")
     tim.add_argument("morse", nargs="+", type=str, help="Morse code to process")
 
+    audio = subparsers.add_parser("audio", help="Generate audio from morse code")
+    audio.add_argument("morse", nargs="+", type=str, help="Morse code to convert to audio")
+    audio.add_argument("--path", type=str, default="output.wav", help="Path to save the audio file")
+
     args = parser.parse_args()
     if args.command == "encode":
         print(encode(" ".join(args.text)))
@@ -142,8 +144,9 @@ def main():
         print(decode(" ".join(args.morse)))
     elif args.command == "timing":
         print(timing_sequence(" ".join(args.morse)))
-
-    
+    elif args.command == "audio":
+        write_wav(" ".join(args.morse), args.path)
+        print(f"Audio saved to {args.path}")
 
 if __name__ == "__main__":
     main()
