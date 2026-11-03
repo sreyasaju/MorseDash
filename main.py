@@ -1,5 +1,6 @@
 import argparse
 import math
+import struct
 import wave
 
 
@@ -60,9 +61,28 @@ def write_wav(morse, path, wpm=15, frequency=600, sample_rate=8000):
     unit_duration = 1.2/wpm
     unit_frames = int(unit_duration * sample_rate)
 
-    wave.open(path,'wb').setparams((1,2,sample_rate,0,'NONE','not compressed'))
-    
+    with wave.open(path, 'wb') as wav_file:
+        wav_file.setnchannels(1)  # mono
+        wav_file.setsampwidth(2)  # 2 bytes per sample
+        wav_file.setframerate(sample_rate)
 
+        audio_samples = bytearray()
+        sample_index = 0 #position across entire audio
+
+        for is_on, units in timing_sequence(morse):
+
+            total_frames = units*unit_frames
+
+            for i in range(total_frames):
+                if is_on:
+                    t = sample_index/sample_rate
+                    sine_wave = int(32767.0*math.sin(2.0*math.pi*frequency*t))
+                    audio_samples+=struct.pack('<h', sine_wave)
+                else:
+                    audio_samples+=struct.pack('<h', 0)
+                sample_index += 1
+
+        wav_file.writeframes(audio_samples)
 
 def timing_sequence(morse):
     """
