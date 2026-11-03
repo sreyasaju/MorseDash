@@ -48,7 +48,7 @@ def decode(morse):
             if code not in REVERSE:
                 raise ValueError(f"Morse code '{code}' cannot be decoded.")
             letters.append(REVERSE[code])
-# to prevent adding empty words incase there are trailing spaces.
+        # to prevent adding empty words incase there are trailing spaces.
         if letters:
             words.append("".join(letters))
     return " ".join(words)
@@ -118,7 +118,6 @@ def write_wav(morse, path, wpm=15, frequency=600, sample_rate=8000):
         wav_file.writeframes(audio_samples)
     return sample_index
 
-write_wav("... --- ...", "sos.wav")
 
 def main():
     parser = argparse.ArgumentParser(description="A morse code convertor tool!")
